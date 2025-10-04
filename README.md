@@ -50,7 +50,7 @@ A simple car rental website built with Python (Flask) featuring:
   python app.py
 
 4) Open in your browser
-  http://127.0.0.1:5000/
+  http://127.0.0.1:5001/
 
 On first run, the database (app.db) is created and 3 Tesla cars are seeded automatically.
 
