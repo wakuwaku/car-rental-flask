@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}All Bookings{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-extrabold">All Bookings</h1>
+  <a href="{{ url_for('index') }}" class="text-sm text-blue-600 hover:underline">Back to home</a>
+</div>
+
+<div class="rounded-2xl bg-white shadow overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-50">
+        <tr class="text-left">
+          <th class="px-4 py-3">Booking ID</th>
+          <th class="px-4 py-3">Car</th>
+          <th class="px-4 py-3">Color</th>
+          <th class="px-4 py-3">Customer</th>
+          <th class="px-4 py-3">Email</th>
+          <th class="px-4 py-3">Start</th>
+          <th class="px-4 py-3">End</th>
+          <th class="px-4 py-3">Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if bookings %}
+          {% for b in bookings %}
+          <tr class="border-t">
+            <td class="px-4 py-3 font-mono">#{{ b.id }}</td>
+            <td class="px-4 py-3">{{ b.car.name if b.car }}</td>
+            <td class="px-4 py-3">{{ b.car.color if b.car }}</td>
+            <td class="px-4 py-3">{{ b.customer_name }}</td>
+            <td class="px-4 py-3">{{ b.customer_email }}</td>
+            <td class="px-4 py-3">{{ b.start_date }}</td>
+            <td class="px-4 py-3">{{ b.end_date }}</td>
+            <td class="px-4 py-3 font-mono">{{ b.created_at.strftime('%Y-%m-%d %H:%M:%S') if b.created_at }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td class="px-4 py-8 text-center text-slate-500" colspan="8">No bookings yet.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

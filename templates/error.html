@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  <div class="rounded-3xl p-8 text-white vibrant-bg shadow-lg">
+    <h1 class="text-3xl font-extrabold">Something went wrong</h1>
+    <p class="mt-2 text-white/90">{{ message or "An unexpected error occurred." }}</p>
+  </div>
+
+  <div class="mt-6 rounded-2xl bg-white shadow p-6">
+    <p class="text-slate-700">Please go back and try again.</p>
+    <div class="mt-4 flex gap-3">
+      <a href="{{ back_url or url_for('index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-lg text-white btn-gradient hover:opacity-95 transition">
+        Go back
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.293 15.707a1 1 0 010-1.414L12.586 12H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 111.414-1.414l4 4a.997.997 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.414 0z"/></svg>
+      </a>
+      <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition">
+        Home
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

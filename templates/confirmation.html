@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Booking Confirmed{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+  <div class="rounded-3xl p-8 text-white vibrant-bg shadow-lg">
+    <h1 class="text-3xl font-extrabold">Booking Confirmed</h1>
+    <p class="mt-2 text-white/90">Thank you for your booking. A confirmation has been recorded.</p>
+  </div>
+
+  <div class="mt-8 grid md:grid-cols-2 gap-6">
+    <div class="rounded-2xl bg-white shadow overflow-hidden">
+      {% if booking.car.image_url %}
+        <img src="{{ booking.car.image_url }}" alt="{{ booking.car.name }} {{ booking.car.color }}" class="w-full h-48 object-cover">
+      {% else %}
+        <div class="w-full h-48 card-gradient"></div>
+      {% endif %}
+      <div class="p-6">
+        <h2 class="text-xl font-bold">{{ booking.car.name }}</h2>
+        <p class="text-slate-600">Color: <span class="font-semibold">{{ booking.car.color }}</span></p>
+        <p class="text-slate-600 mt-2 text-sm">Prices: Weekdays €{{ booking.car.weekday_price }}/day • Sat/Sun €{{ booking.car.weekend_price }}/day</p>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-white shadow p-6">
+      <h3 class="text-lg font-bold">Booking details</h3>
+      <dl class="mt-4 space-y-2 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-slate-600">Name</dt>
+          <dd class="font-semibold">{{ booking.customer_name }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-600">Email</dt>
+          <dd class="font-mono">{{ booking.customer_email }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-600">Start date</dt>
+          <dd class="font-semibold">{{ booking.start_date }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-600">End date</dt>
+          <dd class="font-semibold">{{ booking.end_date }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-600">Days</dt>
+          <dd class="font-bold">{{ days }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-600">Total</dt>
+          <dd class="text-lg font-extrabold">€{{ total }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-slate-600">Created</dt>
+          <dd class="font-mono">{{ booking.created_at.strftime('%Y-%m-%d %H:%M:%S') if booking.created_at }}</dd>
+        </div>
+      </dl>
+
+      <a href="{{ url_for('index') }}" class="mt-6 inline-flex items-center gap-2 px-5 py-3 rounded-lg text-white btn-gradient hover:opacity-95 transition">
+        Back to home
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.293 15.707a1 1 0 010-1.414L12.586 12H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 111.414-1.414l4 4a.997.997 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.414 0z"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

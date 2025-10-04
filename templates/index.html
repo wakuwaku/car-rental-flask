@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Tesla3 Rentals - Choose Your Model 3{% endblock %}
+
+{% block content %}
+<section class="mb-10">
+  <div class="rounded-3xl p-8 md:p-12 text-white vibrant-bg shadow-lg">
+    <div class="grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">Rent a Tesla Model 3 Performance</h1>
+        <p class="mt-4 text-white/90 text-lg">Three colors available: Red, White, Blue. Weekdays €100/day. Saturday & Sunday €200/day.</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <span class="px-3 py-2 rounded-lg bg-white/15">Instant online booking</span>
+          <span class="px-3 py-2 rounded-lg bg-white/15">Live availability</span>
+          <span class="px-3 py-2 rounded-lg bg-white/15">Vibrant experience</span>
+        </div>
+      </div>
+      <div class="glass rounded-2xl p-6">
+        <p class="text-sm text-white/90">How pricing works:</p>
+        <ul class="mt-2 text-sm leading-7">
+          <li>• Monday–Friday: €100/day</li>
+          <li>• Saturday & Sunday: €200/day</li>
+          <li>• Price calculates automatically over your selected dates</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 class="text-2xl font-bold mb-6">Available Cars</h2>
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for car in cars %}
+    <div class="rounded-2xl overflow-hidden bg-white shadow hover:shadow-xl transition">
+      <div class="relative">
+        {% if car.image_url %}
+          <img src="{{ car.image_url }}" alt="{{ car.name }} {{ car.color }}" class="w-full h-44 object-cover">
+        {% else %}
+          <div class="w-full h-44 card-gradient"></div>
+        {% endif %}
+        <div class="absolute top-3 left-3">
+          <span class="px-2 py-1 text-xs rounded bg-black/60 text-white">{{ car.color }}</span>
+        </div>
+      </div>
+      <div class="p-5">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold">{{ car.name }}</h3>
+          <span class="text-xs px-2 py-1 rounded bg-slate-100">ID #{{ car.id }}</span>
+        </div>
+        <p class="text-sm text-slate-600 mt-1">Weekdays €{{ car.weekday_price }} • Weekend €{{ car.weekend_price }}</p>
+        <a href="{{ url_for('car_detail', car_id=car.id) }}"
+           class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white btn-gradient hover:opacity-95 transition">
+          Book this car
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10.293 15.707a1 1 0 010-1.414L12.586 12H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 111.414-1.414l4 4a.997.997 0 01.083 1.32l-.083.094-4 4a1 1 0 01-1.414 0z"/></svg>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

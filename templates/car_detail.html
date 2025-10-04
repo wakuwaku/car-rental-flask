@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Book {{ car.name }} - {{ car.color }}{% endblock %}
+
+{% block content %}
+<div class="grid lg:grid-cols-2 gap-8 items-start">
+  <div class="rounded-2xl overflow-hidden bg-white shadow">
+    {% if car.image_url %}
+      <img src="{{ car.image_url }}" alt="{{ car.name }} {{ car.color }}" class="w-full h-72 object-cover">
+    {% else %}
+      <div class="w-full h-72 card-gradient"></div>
+    {% endif %}
+    <div class="p-6">
+      <h1 class="text-2xl font-extrabold">{{ car.name }}</h1>
+      <p class="text-slate-600 mt-1">Color: <span class="font-semibold">{{ car.color }}</span></p>
+      <div class="mt-4 flex flex-wrap gap-2 text-sm">
+        <span class="px-2 py-1 rounded bg-slate-100">Weekdays €{{ car.weekday_price }}/day</span>
+        <span class="px-2 py-1 rounded bg-slate-100">Sat/Sun €{{ car.weekend_price }}/day</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-2xl bg-white shadow p-6">
+    <h2 class="text-xl font-bold">Book this car</h2>
+    <p class="text-sm text-slate-600 mt-1">Select your rental period. Unavailable dates are disabled.</p>
+
+    <form method="post" action="{{ url_for('book') }}" class="mt-5 space-y-4" id="bookingForm">
+      <input type="hidden" name="car_id" value="{{ car.id }}">
+      <input type="hidden" name="start_date" id="start_date">
+      <input type="hidden" name="end_date" id="end_date">
+
+      <div>
+        <label class="block text-sm font-semibold mb-1">Full name</label>
+        <input required type="text" name="customer_name" class="w-full rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 px-3 py-2" placeholder="Your name">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Email</label>
+        <input required type="email" name="customer_email" class="w-full rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 px-3 py-2" placeholder="you@example.com">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Rental dates</label>
+        <input id="dateRange" type="text" class="w-full rounded-lg border-slate-300 focus:ring-2 focus:ring-blue-500 px-3 py-2" placeholder="Select date range" readonly>
+        <p class="text-xs text-slate-500 mt-1">Inclusive dates. Minimum 1 day.</p>
+      </div>
+
+      <div class="glass rounded-xl p-4 mt-4">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-white/90">Days</div>
+          <div id="daysOut" class="font-bold">—</div>
+        </div>
+        <div class="flex items-center justify-between mt-2">
+          <div class="text-sm text-white/90">Total</div>
+          <div id="totalOut" class="text-lg font-extrabold">—</div>
+        </div>
+      </div>
+
+      <button type="submit" class="mt-4 inline-flex items-center gap-2 px-5 py-3 rounded-lg text-white btn-gradient hover:opacity-95 transition disabled:opacity-50" id="bookBtn" disabled>
+        Book now
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016.24 3H3.76a2 2 0 00-1.757 2.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
+      </button>
+    </form>
+
+    <a href="{{ url_for('index') }}" class="inline-block mt-3 text-sm text-blue-600 hover:underline">Back to all cars</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  const carId = {{ car.id }};
+  const dateInput = document.getElementById('dateRange');
+  const startField = document.getElementById('start_date');
+  const endField = document.getElementById('end_date');
+  const daysOut = document.getElementById('daysOut');
+  const totalOut = document.getElementById('totalOut');
+  const bookBtn = document.getElementById('bookBtn');
+
+  function fmtYmd(d) {
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  async function fetchDisabledRanges() {
+    const res = await fetch(`/api/cars/${carId}/disabled-dates`);
+    if (!res.ok) return [];
+    return await res.json();
+  }
+
+  async function initPicker() {
+    const disabled = await fetchDisabledRanges();
+    const fp = flatpickr(dateInput, {
+      mode: 'range',
+      dateFormat: 'Y-m-d',
+      minDate: 'today',
+      disable: disabled,
+      onChange: async (selectedDates) => {
+        if (selectedDates.length === 2) {
+          const s = fmtYmd(selectedDates[0]);
+          const e = fmtYmd(selectedDates[1]);
+          startField.value = s;
+          endField.value = e;
+          bookBtn.disabled = true;
+          daysOut.textContent = '...';
+          totalOut.textContent = '...';
+          try {
+            const url = `/api/quote?car_id=${carId}&start=${s}&end=${e}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (res.ok && !data.error) {
+              daysOut.textContent = data.days;
+              totalOut.textContent = formatEUR(data.total);
+              bookBtn.disabled = false;
+            } else {
+              daysOut.textContent = '—';
+              totalOut.textContent = '—';
+              bookBtn.disabled = true;
+            }
+          } catch (e) {
+            daysOut.textContent = '—';
+            totalOut.textContent = '—';
+            bookBtn.disabled = true;
+          }
+        } else {
+          startField.value = '';
+          endField.value = '';
+          daysOut.textContent = '—';
+          totalOut.textContent = '—';
+          bookBtn.disabled = true;
+        }
+      }
+    });
+  }
+
+  initPicker();
+</script>
+{% endblock %}
